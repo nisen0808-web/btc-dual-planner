@@ -1,0 +1,15 @@
+.git
+.env
+.env.*
+node_modules
+outputs
+.sites-runtime
+execution-data
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+*.dpapi
+**/*.sqlite
+**/*.sqlite-shm
+**/*.sqlite-wal
+**/*.dpapi

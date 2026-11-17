@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#143d32">
+  <meta name="description" content="按平台对比 BTC 期权和双币的本期净收入、年化和保险成本，查看 Binance、OKX、Coinbase、Gate 和 Bitget 的公开报价。">
+  <title>BTC 期权与双币 · 收益对比</title>
+  <link rel="stylesheet" href="/comparison.css">
+</head>
+<body>
+  <header class="masthead"><div class="wrap masthead-inner">
+    <a class="brand" href="#main"><span class="brand-icon" aria-hidden="true">₿</span> BTC 策略观察</a>
+    <nav class="header-nav" aria-label="策略导航"><a href="#insurance" class="header-link" id="insuranceLink">双币与期权保险</a><a href="/?view=spot-put" class="header-link">现货防跌保险</a></nav>
+  </div></header>
+  <main id="main" class="wrap">
+    <section class="intro" aria-labelledby="pageTitle">
+      <div><h1 id="pageTitle">期权与双币收益对比</h1>
+      <p id="introNote">用同一笔 BTC，对比高卖收取的权利金、双币利息和买保险后的收益。</p></div>
+      <div class="index-box"><span id="indexLabel">BTC 指数</span><strong id="indexValue">—</strong><small id="indexTime">读取中</small></div>
+    </section>
+    <section class="controls" aria-label="比较条件">
+      <div class="controls-top">
+        <div class="modes" role="group" aria-label="比较方向">
+          <button type="button" id="lowMode" aria-pressed="false">低买 <span>PUT</span></button>
+          <button type="button" id="highMode" aria-pressed="true">高卖 <span>CALL</span></button>
+        </div>
+        <button type="button" class="refresh" id="refresh"><span aria-hidden="true">↻</span> 刷新报价</button>
+      </div>
+      <div class="fields trade-fields">
+        <div class="amount-field">
+          <label for="amount" id="amountLabel">当次投入</label>
+          <div class="input-wrap amount-control">
+            <input type="text" id="amount" inputmode="decimal" spellcheck="false" autocomplete="off" value="1" aria-describedby="amountHint">
+            <select id="amountUnit" aria-label="投入币种"><option value="BTC">BTC</option><option value="USDT">USDT</option></select>
+          </div>
+        </div>
+        <div class="target-pair">
+          <label for="strike"><span id="strikeLabel">目标卖价</span><span class="input-wrap"><input type="text" id="strike" inputmode="decimal" spellcheck="false" autocomplete="off" placeholder="输入价格" list="strikes" aria-describedby="strikeHint"><span id="strikeUnit">USDT</span></span><datalist id="strikes"></datalist></label>
+          <label for="strikePercent"><span>距现价 <small id="strikePercentDirection">高卖默认 +</small></span><span class="input-wrap"><input type="text" id="strikePercent" inputmode="text" enterkeyhint="done" autocapitalize="off" spellcheck="false" autocomplete="off" placeholder="输入百分比" aria-describedby="strikeHint"><span>%</span></span></label>
+        </div>
+        <label for="expiry"><span>到期时间 <small>新加坡</small></span><select id="expiry"><option value="">读取到期日…</option></select></label>
+        <label for="basis"><span>卖方权利金口径</span><select id="basis"><option value="ask_limit">卖一挂价 · 成交后</option><option value="bid_taker">买盘深度 · 即时参考</option></select></label>
+      </div>
+      <p class="input-status" id="amountHint" role="status"></p>
+      <p class="input-status" id="strikeHint" role="status"></p>
+      <p class="input-status" id="inputStatus" role="status">正在读取各平台公开报价。</p>
+    </section>
+    <section class="results" id="comparisonTitle" aria-labelledby="resultHeading">
+      <div class="section-head"><h2 id="resultHeading">本期收益对比</h2><span id="comparisonCondition">到期未触发</span></div>
+      <div class="difference">
+        <div class="difference-pair"><label for="optionComparison">卖出期权<select id="optionComparison"><option value="all">全部期权</option><option value="binance" selected>Binance</option><option value="okx">OKX</option><option value="coinbase">Coinbase App · Deribit</option><option value="gate">Gate</option></select></label>
+        <label for="dualComparison">对比双币<select id="dualComparison"><option value="all">全部双币</option><option value="binance" selected>Binance</option><option value="okx">OKX</option><option value="gate">Gate</option><option value="bitget">Bitget</option></select></label></div>
+        <div class="difference-result" aria-live="polite"><strong id="differenceValue">等待读取</strong><span id="differenceDetail"></span></div>
+      </div>
+      <table class="returns">
+        <thead><tr><th scope="col">方案</th><th scope="col">本期净收入</th><th scope="col">本期收益率</th><th scope="col">简单年化 / 平台 APR</th><th scope="col" id="allDeltaHead" hidden>与对侧最高收入差</th></tr></thead>
+        <tbody id="returnsBody"></tbody>
+      </table>
+      <p class="explanation" id="comparisonNote"></p>
+    </section>
+    <div class="detail-grid" id="detailGrid">
+      <section class="detail insurance" id="insurance" aria-labelledby="insuranceTitle">
+        <h2 id="insuranceTitle">保险怎么算</h2>
+        <div class="insurance-controls">
+          <label for="insuranceType">保护对象<select id="insuranceType"><option value="dual">普通双币本息</option><option value="option">卖出的期权</option></select></label>
+          <label for="insuranceExpiry">保护到期日 · 新加坡<select id="insuranceExpiry"><option value="same">与主合约同到期</option></select></label>
+          <label for="insuranceStrike" id="insuranceStrikeLabel" hidden>保护执行价 · <span id="insuranceStrikeUnit">USDT</span><select id="insuranceStrike"></select></label>
+        </div>
+        <p id="insuranceIntro"></p>
+        <dl id="insuranceFacts"></dl><p class="footnote" id="insuranceOutcome"></p>
+        <a class="spot-entry" href="/?view=spot-put" id="spotPut">持有 BTC？计算现货防跌保险 <span aria-hidden="true">→</span></a>
+      </section>
+      <section class="detail market" aria-labelledby="marketTitle">
+        <h2 id="marketTitle">期权盘口</h2><p id="contract">等待所选合约</p>
+        <dl id="bookFacts"></dl><p class="footnote" id="bookNote"></p>
+      </section>
+    </div>
+    <details class="fees" id="binanceFees"><summary>费用与到期结算</summary><div class="fee-content"><dl id="feeFacts"></dl><p id="settleInfo" class="footnote"></p>
+      <div class="links"></div></div></details>
+    <noscript>请启用 JavaScript 读取最新报价。</noscript>
+  </main>
+  <script type="module" src="/comparison-app.js"></script>
+</body></html>

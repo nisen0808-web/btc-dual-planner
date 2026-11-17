@@ -1,0 +1,12 @@
+{
+  "name": "btc-put-live",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node scripts/build-worker.mjs && node --test amount-input-tests.mjs binance-dual-tests.mjs binance-desk-tests.mjs binance-options-tests.mjs ask-limit-desk-tests.mjs ask-limit-quote-tests.mjs call-feed-tests.mjs call-math-tests.mjs binance-changing-catalogue-tests.mjs tests/*.test.mjs",
+    "build": "node scripts/build-worker.mjs",
+    "validate": "node scripts/validate-artifact.mjs",
+    "dev": "node scripts/preview-worker.mjs",
+    "build:cloud-feed": "node scripts/build-cloud-feed.mjs"
+  }
+}

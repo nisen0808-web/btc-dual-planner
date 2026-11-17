@@ -1,0 +1,12 @@
+.sites-runtime/
+outputs/
+node_modules/
+git-diag.mjs
+live-smoke.mjs
+
+.env*
+!.env.example
+execution-data/
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal

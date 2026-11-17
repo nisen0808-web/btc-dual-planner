@@ -1,0 +1,10 @@
+[build]
+  command = "node --check netlify/functions/dual.mjs && node --check netlify/functions/dual-high.mjs && node --check netlify/edge-functions/options.js"
+  publish = "public"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"

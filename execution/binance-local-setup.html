@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <meta name="local-csrf" content="__NONCE__">
+  <meta name="site-origin" content="__SITE_ORIGIN__">
+  <title>连接本机 Binance 账户</title>
+  <style nonce="__NONCE__">
+    :root{font-family:system-ui,-apple-system,"Microsoft YaHei",sans-serif;color:#172d29;background:#f3f6f2;font-synthesis:none}*{box-sizing:border-box}body{margin:0}main{max-width:850px;margin:auto;padding:44px 24px 64px}.eyebrow{font-size:14px;font-weight:700;letter-spacing:.06em;color:#4a6f60}h1{font-size:clamp(28px,5vw,39px);line-height:1.25;margin:12px 0 18px}p{line-height:1.8;margin:10px 0;color:#52645b}.intro{font-size:17px;max-width:700px}.card{margin-top:24px;padding:28px;background:#fff;border:1px solid #dce5dc;border-radius:20px;box-shadow:0 5px 20px #18392b05}h2{font-size:21px;margin:0 0 16px}.step{display:inline-grid;place-items:center;width:29px;height:29px;margin-right:9px;background:#eaf1e9;border-radius:50%;font-size:15px;color:#306848}label.field{display:block;margin-top:20px;font-weight:650}input[type=password],select{display:block;width:100%;min-height:50px;margin-top:9px;padding:11px 13px;border:1px solid #c5d2c6;border-radius:10px;font:inherit;background:white;color:inherit}input:focus-visible,select:focus-visible,button:focus-visible,a:focus-visible{outline:3px solid #b6d99c;outline-offset:3px}.check{display:flex;gap:11px;align-items:flex-start;margin:22px 0 8px;line-height:1.7}.check input{width:19px;height:19px;flex:none;margin-top:5px}.hint{font-size:14px}.warning{padding:13px 15px;border-radius:10px;background:#fff4de;color:#74500e}.actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:21px}button{min-height:49px;border:0;border-radius:11px;padding:12px 20px;font:inherit;font-weight:650;cursor:pointer;background:#255b3b;color:white}button.secondary{background:#edf2eb;color:#28533c}button:disabled{opacity:.55;cursor:wait}.message{margin-top:17px;min-height:25px;font-size:15px;line-height:1.7;white-space:pre-line}.message[data-state=error]{color:#aa382d}.message[data-state=success]{color:#27643b}.status-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.status-item{background:#f5f8f3;border-radius:11px;padding:14px}.status-item span{display:block;font-size:13px;color:#6c7d70}.status-item strong{display:block;font-size:16px;margin-top:6px}.site{overflow-wrap:anywhere;font-size:14px;background:#f5f8f3;border-radius:10px;padding:13px 15px}.footer{margin-top:24px;font-size:14px}@media(max-width:520px){main{padding:27px 16px 40px}.card{padding:21px 18px}.status-grid{grid-template-columns:1fr}.actions button{width:100%}}
+  </style>
+</head>
+<body>
+<main>
+  <div class="eyebrow">本机账户连接 · BINANCE</div>
+  <h1>让策略页面连接这台电脑</h1>
+  <p class="intro">账户密钥只保存在这台 Windows 电脑，由当前 Windows 用户加密保管。策略页面只接收短期配对凭证，不接收账户密钥。请保持电脑和本机服务运行，才能持续处理订单与到期接币。</p>
+
+  <section class="card" aria-labelledby="configure-title">
+    <h2 id="configure-title"><span class="step">1</span>配置账户</h2>
+    <p>本次接入 Binance 主网。请由你本人输入 API Key 和 Secret；下单开关默认关闭，保存配置不会下单。每笔策略还需回到网站最终确认。</p>
+    <p class="hint">请使用专用账户，开启账户读取、期权卖方和现货交易；自动买币还需要本账号期权钱包到现货钱包的内部划转权限。关闭提现和跨账户划转。只读 Key 无法下单，账户、卖方资格与费率会单独核验。</p>
+    <form id="configure-form" autocomplete="off">
+      <label class="field" for="environment">账户环境</label>
+      <select id="environment" name="environment"><option value="mainnet" selected>Binance 主网 · 使用真实资金</option></select>
+      <label class="field" for="api-key">API Key</label>
+      <input id="api-key" name="apiKey" type="password" autocomplete="off" spellcheck="false" autocapitalize="none" required maxlength="512" aria-describedby="credential-note">
+      <label class="field" for="api-secret">API Secret</label>
+      <input id="api-secret" name="apiSecret" type="password" autocomplete="new-password" spellcheck="false" autocapitalize="none" required maxlength="2048" aria-describedby="credential-note">
+      <p class="hint" id="credential-note">保存请求结束后，输入框会清空。密钥不会发送到策略网站，也不会保存在浏览器存储中。</p>
+      <label class="check"><input id="trading-enabled" name="tradingEnabled" type="checkbox"><span>允许本机使用这次账户连接执行我逐笔确认的真实订单，并按所选到期模式处理本笔资金。</span></label>
+      <p id="environment-note" class="hint">默认关闭下单。保存账户配置不会提交订单；账户、权限与资金仍需核验。</p>
+      <div class="actions"><button id="save-config" type="submit">保存本机配置</button></div>
+      <div id="configure-message" class="message" role="status" aria-live="polite"></div>
+    </form>
+  </section>
+
+  <section class="card" aria-labelledby="status-title">
+    <h2 id="status-title"><span class="step">2</span>检查本机状态</h2>
+    <div class="status-grid">
+      <div class="status-item"><span>账户配置</span><strong id="config-status">尚未核验</strong></div>
+      <div class="status-item"><span>账户环境</span><strong id="environment-status">尚未核验</strong></div>
+      <div class="status-item"><span>账户与资金</span><strong id="account-status">尚未核验</strong></div>
+      <div class="status-item"><span>常驻执行服务</span><strong id="runner-status">尚未核验</strong></div>
+    </div>
+    <div class="actions"><button id="refresh-status" class="secondary" type="button">重新检查</button></div>
+    <div id="status-message" class="message" role="status" aria-live="polite"></div>
+  </section>
+
+  <section class="card" aria-labelledby="pair-title">
+    <h2 id="pair-title"><span class="step">3</span>授权策略页面连接</h2>
+    <p>点击配对后，下面这个策略网站可以通过本机服务查看账户状态，并按你在策略页面逐次确认的条件请求执行。</p>
+    <div class="site" id="trusted-site"></div>
+    <p class="hint">配对不等于确认卖 PUT。每次新策略仍需在策略页面检查金额、接币价和到期时间后确认。</p>
+    <div class="actions"><button id="pair-site" type="button">配对策略页面</button><button id="revoke-site" class="secondary" type="button">撤销网页配对</button></div>
+    <p class="hint">撤销配对只会断开网页连接。已确认的策略、PUT 持仓和已提交订单仍由本机执行服务继续处理；如需暂停后续自动动作，请先在策略页面暂停。</p>
+    <div id="pair-message" class="message" role="status" aria-live="polite"></div>
+  </section>
+  <p class="footer">电脑休眠、关机或停止本机服务后，到期自动买币无法保证执行；交易所仍会按期权规则结算。需要停止自动动作时，先在策略页面暂停；已经提交的订单仍需继续对账。</p>
+</main>
+<script nonce="__NONCE__">
+(() => {
+  'use strict';
+  const el = id => document.getElementById(id);
+  const csrf = document.querySelector('meta[name="local-csrf"]').content;
+  const rawSiteOrigin = document.querySelector('meta[name="site-origin"]').content;
+  let siteOrigin = null;
+  try { const url = new URL(rawSiteOrigin); if (['https:', 'http:'].includes(url.protocol) && url.origin === rawSiteOrigin) siteOrigin = rawSiteOrigin; } catch {}
+  el('trusted-site').textContent = siteOrigin || '策略网站地址尚未正确配置，请停止配对。';
+  let siteWindow = window.opener && !window.opener.closed ? window.opener : null;
+  let waitingForSite = false, pairing = false, localAction = false, readyTimer = null, readyDeadline = 0;
+  el('pair-site').textContent = siteWindow ? '配对策略页面' : '打开策略页面并配对';
+  el('pair-site').disabled = !siteOrigin;
+
+  function message(id, value, state = '') { const box = el(id); box.textContent = value; box.dataset.state = state; }
+  function clearCredentials() { el('api-key').value = ''; el('api-secret').value = ''; }
+  function lockActions(value) { localAction = value; el('save-config').disabled = value; el('pair-site').disabled = value || !siteOrigin; el('revoke-site').disabled = value; }
+  async function request(path, payload) {
+    const controller = new AbortController(), timeout = setTimeout(() => controller.abort(), 15000);
+    try {
+      const response = await fetch(path, {method: payload === undefined ? 'GET' : 'POST', credentials: 'omit', cache: 'no-store', redirect: 'error', headers: {'X-Local-CSRF': csrf, ...(payload === undefined ? {} : {'Content-Type': 'application/json'})}, ...(payload === undefined ? {} : {body: JSON.stringify(payload)}), signal: controller.signal});
+      let body;
+      try { body = await response.json(); } catch { throw new Error('invalid_response'); }
+      if (!response.ok || !body || typeof body !== 'object' || body.ok === false) throw new Error('request_failed');
+      return body;
+    } finally { clearTimeout(timeout); }
+  }
+  function configurationNote() {
+    const mainnet = el('environment').value === 'mainnet';
+    el('environment-note').textContent = mainnet ? '主网使用真实资金。请本人输入主网凭据并明确勾选下单许可；保存不会下单，每笔策略仍需在网站最终确认。' : '默认关闭下单。保存账户配置不会提交订单；账户、权限与资金仍需核验。';
+    el('environment-note').className = mainnet ? 'hint warning' : 'hint';
+  }
+  el('environment').addEventListener('change', () => { el('trading-enabled').checked = false; configurationNote(); });
+  async function refreshStatus() {
+    el('refresh-status').disabled = true;
+    message('status-message', '正在检查本机服务与账户状态…');
+    try {
+      const body = await request('/local/status');
+      const config = body.config && typeof body.config === 'object' ? body.config : body;
+      const state = body.execution && typeof body.execution === 'object' ? body.execution : body;
+      el('config-status').textContent = config.configured === true ? '已保存本机配置' : config.configured === false ? '尚未配置' : '配置状态未核验';
+      el('environment-status').textContent = config.environment === 'mainnet' ? '主网 · 真实资金' : config.environment === 'testnet' ? '测试网 · 测试资金' : '尚未核验';
+      el('account-status').textContent = state.accountVerified === true ? '服务已完成账户核验' : '尚未完成账户核验';
+      el('runner-status').textContent = state.runnerOnline === true ? '正在运行' : '尚无有效运行证明';
+      message('status-message', state.canSubmit === true ? '本机服务报告当前可以准备新策略。请回策略页面逐次检查并确认委托。' : '账户配置、执行服务和下单条件需要分别核验。当前页面不会据配置成功宣称可以交易。');
+    } catch {
+      for (const id of ['config-status', 'environment-status', 'account-status', 'runner-status']) el(id).textContent = '本次未能核验';
+      message('status-message', '未能读取本机状态。请确认本机服务正在运行，再重新检查。', 'error');
+    } finally { el('refresh-status').disabled = false; }
+  }
+  el('refresh-status').addEventListener('click', refreshStatus);
+  el('configure-form').addEventListener('submit', async event => {
+    event.preventDefault();
+    if (localAction) return;
+    const environment = el('environment').value;
+    if (environment !== 'mainnet') return;
+    const payload = {apiKey: el('api-key').value, apiSecret: el('api-secret').value, environment, tradingEnabled: el('trading-enabled').checked === true};
+    if (!payload.apiKey || !payload.apiSecret) return;
+    finishWaiting(); lockActions(true);
+    message('configure-message', '正在把配置交给这台电脑的本机服务…');
+    try {
+      await request('/local/configure', payload);
+      clearCredentials(); payload.apiKey = ''; payload.apiSecret = '';
+      message('configure-message', '本机服务已接受配置请求，尚未下单。请检查下方账户状态，再返回策略页面逐笔确认。', 'success');
+      await refreshStatus();
+    } catch {
+      message('configure-message', '本机服务未能接受配置。请核对账户环境和密钥，并确认服务正常运行；已有未结束策略时不能更换账户配置。', 'error');
+    } finally {
+      clearCredentials(); payload.apiKey = ''; payload.apiSecret = ''; el('trading-enabled').checked = false; lockActions(false);
+    }
+  });
+  function finishWaiting() { waitingForSite = false; clearInterval(readyTimer); readyTimer = null; }
+  async function deliverPair() {
+    if (pairing || localAction || !siteOrigin || !siteWindow || siteWindow.closed) return;
+    pairing = true; finishWaiting(); lockActions(true);
+    message('pair-message', '正在生成短期配对凭证…');
+    try {
+      const body = await request('/local/pair', {});
+      if (body.siteOrigin !== siteOrigin || typeof body.token !== 'string' || body.token.length < 16 || body.token.length > 4096 || !Number.isSafeInteger(body.expiresAt) || body.expiresAt <= Date.now() || !siteWindow || siteWindow.closed) throw new Error('pair_invalid');
+      siteWindow.postMessage({type: 'binance-local-paired', token: body.token, expiresAt: body.expiresAt}, siteOrigin);
+      body.token = '';
+      message('pair-message', '配对信息已发送。请返回策略页面核验连接状态，再逐次确认策略。', 'success');
+    } catch { message('pair-message', '配对未能完成。请保持策略页面和本机服务打开，再点击配对。', 'error'); }
+    finally { pairing = false; lockActions(false); }
+  }
+  window.addEventListener('message', event => {
+    if (!waitingForSite || !siteOrigin || event.origin !== siteOrigin || event.source !== siteWindow || event.data?.type !== 'binance-local-site-ready' || event.data.ready !== true) return;
+    deliverPair();
+  });
+  el('pair-site').addEventListener('click', () => {
+    if (!siteOrigin || pairing || localAction) return;
+    if (window.opener && !window.opener.closed) { siteWindow = window.opener; deliverPair(); return; }
+    finishWaiting();
+    siteWindow = window.open(siteOrigin, 'binance-local-strategy');
+    if (!siteWindow) { message('pair-message', '浏览器没有打开策略页面。请允许这次打开新窗口后重试。', 'error'); return; }
+    waitingForSite = true; readyDeadline = Date.now() + 30000;
+    message('pair-message', '已打开策略页面，正在等待该页面确认准备好连接…');
+    readyTimer = setInterval(() => {
+      if (!siteWindow || siteWindow.closed || Date.now() >= readyDeadline) { finishWaiting(); message('pair-message', '尚未收到策略页面的就绪确认。请保持页面打开，再点击配对。', 'error'); return; }
+      siteWindow.postMessage({type: 'binance-local-site-ready'}, siteOrigin);
+    }, 750);
+  });
+  el('revoke-site').addEventListener('click', async () => {
+    if (localAction) return;
+    finishWaiting(); lockActions(true);
+    message('pair-message', '正在撤销网页配对…');
+    try {
+      const body = await request('/local/revoke', {});
+      if (body.revoked !== true) throw new Error('revoke_unverified');
+      message('pair-message', '本机服务已撤销网页配对。已确认策略与已提交订单仍继续处理；撤销配对不会暂停或平仓。', 'success');
+    } catch { message('pair-message', '本次未能确认配对已撤销。请保持本机服务运行后重试，不要据此认为策略已停止。', 'error'); }
+    finally { lockActions(false); }
+  });
+  window.addEventListener('pagehide', () => { clearCredentials(); finishWaiting(); });
+  refreshStatus();
+})();
+</script>
+</body>
+</html>

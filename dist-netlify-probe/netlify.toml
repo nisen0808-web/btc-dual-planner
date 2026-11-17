@@ -1,0 +1,10 @@
+[build]
+  command = "node --check netlify/functions/verify.mjs"
+  publish = "public"
+
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+
+[build.environment]
+  NODE_VERSION = "22"
